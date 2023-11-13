@@ -1,0 +1,115 @@
+---
+title: "Project"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(neuralnet)
+library(readxl)
+```
+
+#Training Data Set
+```{r}
+train <- read_excel("big_training_data.xlsx")
+```
+
+#Normalizing my data points
+```{r}
+train$gre <- (train$gre - min(train$gre))/(max(train$gre) - min(train$gre))
+```
+
+```{r}
+hist(train$gre)
+```
+
+
+```{r}
+train$gpa <- (train$gpa - min(train$gpa))/(max(train$gpa) - min(train$gpa))
+```
+
+```{r}
+hist(train$gpa)
+```
+
+
+```{r}
+train$rank <- (train$rank - min(train$rank))/(max(train$rank) - min(train$rank))
+```
+
+```{r}
+hist(train$rank)
+```
+
+
+
+#Neural Network
+```{r}
+network <- neuralnet(admit ~ ., data = train, hidden = 2, err.fct = "sse", act.fct = "logistic", linear.output = FALSE, rep = 5)
+```
+
+```{r}
+plot(network, rep = "best")
+```
+
+```{r}
+network$result.matrix
+```
+
+
+#Test Data Set
+```{r}
+test <- read_excel("big_test_data.xlsx")
+```
+
+
+#Normalizing Test Data Set
+```{r}
+test$gre <- (test$gre - min(test$gre))/(max(test$gre) - min(test$gre))
+```
+
+```{r}
+test$gpa <- (test$gpa - min(test$gpa))/(max(test$gpa) - min(test$gpa))
+```
+
+```{r}
+test$rank <- (test$rank - min(test$rank))/(max(test$rank) - min(test$rank))
+```
+
+
+#Prediction
+```{r}
+Predict = compute(network,test)
+```
+
+```{r}
+Predict$net.result
+```
+#Convert probability to binary
+```{r}
+prob <- Predict$net.result
+pred <- ifelse(prob > 0.5, 1, 0)
+```
+
+
+```{r}
+pred
+```
+
+
+
+
+
+
+
+
+
+
+
